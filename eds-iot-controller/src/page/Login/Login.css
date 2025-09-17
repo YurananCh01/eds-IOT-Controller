@@ -1,0 +1,131 @@
+/* Background */
+body {
+  margin: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  /* Center horizontally */
+  align-items: center;
+  /* Center vertically */
+}
+
+.login-page {
+ min-height: 100vh;
+ min-width: 100vw;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Login Container */
+.login-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 50px;
+  /* Center content horizontally */
+  align-items: center;
+  /* Center content vertically */
+  height: 100%;
+  width: 100%;
+
+}
+
+/* Login Box */
+.login-box {
+  background-color: #ffffff;
+  padding: 30px 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 350px;
+  text-align: center;
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Form Styles */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  text-align: left;
+}
+
+label {
+  font-weight: bold;
+  margin-bottom: 5px;
+  display: block;
+  color: #333;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-sizing: border-box;
+}
+
+/* Error Message */
+.error {
+  color: #d9534f;
+  font-size: 14px;
+}
+
+/* Button */
+.login-button {
+  background-color: #392D4A;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login-button:hover {
+  background-color: #282221;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .login-box {
+    width: 90%;
+    padding: 30px;
+  }
+}
+
+.logo-title {
+  align-items: center;
+  gap: 16px;
+}
+
+.logo-title .logo-login {
+  width: 140px;
+  height: auto;
+}
+
+.logo-title h2 {
+  margin: 25px;
+  font-size: 1.2rem;
+}
