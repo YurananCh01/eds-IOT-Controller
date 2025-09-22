@@ -52,7 +52,7 @@ const TemplateAdmin: React.FC = () => {
 
                 <div className="sidebar always-visible">
                     <img
-                        src=""//เปลี่ยนโลโก้
+                        src=""
                         alt="Logo"
                         className="logo"
                     />
