@@ -33,7 +33,7 @@ export default function Login() {
                     "user",
                     JSON.stringify({ name: "Tester", role: "Admin", email: input.emp_email })
                 );
-                navigate("/templateAdmin"); 
+                navigate("/Admin"); 
             } else {
                 setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
             }

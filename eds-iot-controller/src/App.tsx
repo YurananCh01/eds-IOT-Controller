@@ -1,4 +1,3 @@
-// App.tsx (หรือ App.jsx)
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './page/Login/Login';
 import DashboardAdmin from './page/DashboardAdmin';
@@ -13,10 +12,8 @@ export default function App() {
         <Route path="/login" element={<Login />} />
 
         {/* layout */}
-        <Route path="/templateAdmin" element={<TemplateAdmin />}>
-          {/* ใช้แบบใดแบบหนึ่ง:
-              1) ให้ /templateAdmin แสดง DashboardAdmin เลย */}
-          <Route index element={<DashboardAdmin />} />
+        <Route path="/Admin" element={<TemplateAdmin />}>
+          <Route path="DashboardAdmin" element={<DashboardAdmin />} />
         </Route>
 
         {/* fallback */}
