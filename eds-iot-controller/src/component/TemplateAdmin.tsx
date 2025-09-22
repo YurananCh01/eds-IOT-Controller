@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
 import "./TemplateAdmin.css";
 
 const TemplateAdmin: React.FC = () => {
@@ -52,7 +52,7 @@ const TemplateAdmin: React.FC = () => {
 
                 <div className="sidebar always-visible">
                     <img
-                        src=""
+                        src="/img/logo.png" //เปลี่ยนโลโก้
                         alt="Logo"
                         className="logo"
                     />
@@ -66,6 +66,15 @@ const TemplateAdmin: React.FC = () => {
                                 onClick={() => handleMenuClick("home")}
                             >
                                 HOME
+                            </Link>
+                        </li>
+                                                <li>
+                            <Link
+                                className={activeMenu === "device" ? "active" : ""}
+                                to={`/device`}
+                                onClick={() => handleMenuClick("device")}
+                            >
+                                Device
                             </Link>
                         </li>
 

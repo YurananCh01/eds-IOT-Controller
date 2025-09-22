@@ -33,7 +33,7 @@ export default function Login() {
                     "user",
                     JSON.stringify({ name: "Tester", role: "Admin", email: input.emp_email })
                 );
-                navigate("/Admin"); 
+                navigate("/templateAdmin"); 
             } else {
                 setError("อีเมลหรือรหัสผ่านไม่ถูกต้อง");
             }
@@ -46,7 +46,7 @@ export default function Login() {
                 <div className="login-box">
                     <div className="logo-title">
                         <img
-                            src="../assets/react.svg" //เปลี่ยนโลโก้
+                            src="/img/logo.png" //เปลี่ยนโลโก้
                             alt="Logo"
                             className="logo-login"
                             style={{ width: '200px' }}

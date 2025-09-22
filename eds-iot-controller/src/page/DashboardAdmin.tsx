@@ -1,10 +1,25 @@
-
-
+import Card from '../component/Card';
+import Table from '../component/Table';
+import "./DashboardAdmin.css";
 export default function DashboardAdmin() {
+
     return (
-        <div>
-            <h1>Admin Dashboard</h1>
-            <p>Welcome, Admin! Here you can manage the system.</p>
-        </div>
+        <> 
+            <div className='device_card'>
+                <Card
+                title="🔵 All Device"
+                value={50}
+                />
+                <Card
+                title="🟢 Online"
+                value={50}
+                />
+                <Card
+                title="🔴 Offline"
+                value={50}
+                />
+            </div>
+         <Table/>
+        </>
     );
 }
