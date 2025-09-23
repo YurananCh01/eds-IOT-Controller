@@ -1,10 +1,11 @@
 .cards {
     border: 1px solid #ccc;
     border-radius: 8px;
-    width: 300px;
+    width: 400px;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     text-align: center;
+    margin: 0px;
   }
 .images{ 
     width: 50px;

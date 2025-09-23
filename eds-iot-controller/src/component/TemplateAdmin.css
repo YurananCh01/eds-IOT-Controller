@@ -105,5 +105,13 @@
 
 /* 🔷 เนื้อหาหลัก Dashboard */
 .dashboard-content {
-  margin-left: 250px; /* เว้นที่ให้ sidebar */
+ padding: 20px;
+  margin-left: 220px; /* เว้นที่ sidebar */
+
+}
+.dashboard-main{
+  justify-content: center;
+  height: calc(100vh - 300px); 
+  display: flex;
+ 
 }
