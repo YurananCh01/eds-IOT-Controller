@@ -43,7 +43,7 @@ export default function DashboardAdmin() {
        
        
       </div>
-       <h2>ตั้งค่า Timer</h2>
+      
         <TimerTable/>
 
 
