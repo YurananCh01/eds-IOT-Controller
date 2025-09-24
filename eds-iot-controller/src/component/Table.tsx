@@ -1,5 +1,5 @@
 import React from 'react';
-
+import {Badge} from 'react-bootstrap'
 type DeviceData = {
   id: number;
   name: string;
@@ -10,6 +10,24 @@ type DeviceData = {
   relayStatus: string;
 };
 
+const statusVariant: Record<string, string> = {
+  online: "success",
+  active: "success",
+  running: "success",
+
+  offline: "secondary",
+  inactive: "secondary",
+
+  warning: "warning",
+  degraded: "warning",
+
+  error: "danger",
+  failed: "danger",
+  fault: "danger",
+
+  unknown: "dark",
+};
+const getStatusVariant = (s: string) => statusVariant[s?.toLowerCase()] ?? "dark";
 const sampleData: DeviceData[] = [
   { id: 1, name: 'Step room 1', power: 1200, current: 5.4, voltage: 220, deviceStatus: 'Online', relayStatus: "1111" },
   { id: 2, name: 'Step room 2', power: 500, current: 2.1, voltage: 220, deviceStatus: 'Offline', relayStatus: "1101" },
@@ -50,8 +68,10 @@ const IotDataTable: React.FC = () => {
               <td style={tdStyle}>{device.power}</td>
               <td style={tdStyle}>{device.current.toFixed(2)}</td>
               <td style={tdStyle}>{device.voltage}</td>
-              <td style={{ ...tdStyle, color: getStatusColor(device.deviceStatus) }}>
-                {device.deviceStatus}
+              <td style={{ textAlign: 'center', fontSize: '1.4rem', ...tdStyle }}>
+                <Badge bg={getStatusVariant(device.deviceStatus)} pill style={{ backgroundColor: getStatusColor(device.deviceStatus) }}>
+                  {device.deviceStatus}
+                </Badge>
               </td>
               <td style={tdStyle}>
               {device.relayStatus

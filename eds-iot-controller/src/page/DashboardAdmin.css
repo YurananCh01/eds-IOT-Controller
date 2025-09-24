@@ -1,3 +1,4 @@
 .device_card{
     display: flex;
+    gap: 20px;
 }
