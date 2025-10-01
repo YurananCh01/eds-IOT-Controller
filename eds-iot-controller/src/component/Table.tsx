@@ -1,13 +1,22 @@
-import React from 'react';
-import {Badge} from 'react-bootstrap'
+import React from "react";
+import Badge from "react-bootstrap/Badge"; // ✅ แนะนำ import แบบนี้เสถียรกว่า
+// หรือจะใช้: import { Badge } from "react-bootstrap";
+
 type DeviceData = {
-  id: number;
+  id: number | string;
   name: string;
-  power: number;     // กำลังไฟฟ้า (Watt)
-  current: number;   // กระแสไฟฟ้า (Ampere)
-  voltage: number;   // แรงดันไฟฟ้า (Volt)
-  deviceStatus: 'Online' | 'Offline' ;
-  relayStatus: string;
+  location: string;
+  power: number;     // W
+  current: number;   // A
+  voltage: number;   // V
+  deviceStatus: "Online" | "Offline" | string;
+  relayStatus: string; // เช่น "1011"
+};
+
+type IotDataTableProps = {
+  alldevice: DeviceData[];
+  loading?: boolean;
+  error?: string | null;
 };
 
 const statusVariant: Record<string, string> = {
@@ -27,33 +36,36 @@ const statusVariant: Record<string, string> = {
 
   unknown: "dark",
 };
-const getStatusVariant = (s: string) => statusVariant[s?.toLowerCase()] ?? "dark";
-const sampleData: DeviceData[] = [
-  { id: 1, name: 'Step room 1', power: 1200, current: 5.4, voltage: 220, deviceStatus: 'Online', relayStatus: "1111" },
-  { id: 2, name: 'Step room 2', power: 500, current: 2.1, voltage: 220, deviceStatus: 'Offline', relayStatus: "1101" },
-  { id: 3, name: 'Step room 3', power: 60, current: 0.3, voltage: 220, deviceStatus: 'Online', relayStatus: "01" },
-  
-];
 
-const getStatusColor = (status: string) => {
-  switch (status) {
-    case 'Online':
-      return 'green';
-    case 'Offline':
-      return 'red';
-    default:
-      return 'black';
-  }
+const getStatusVariant = (s: string) => statusVariant[s?.toLowerCase()] ?? "dark";
+
+const thStyle: React.CSSProperties = {
+  padding: "10px",
+  border: "1px solid #ccc",
+  textAlign: "left",
+  whiteSpace: "nowrap",
 };
 
-const IotDataTable: React.FC = () => {
+const tdStyle: React.CSSProperties = {
+  padding: "10px",
+  border: "1px solid #ccc",
+  verticalAlign: "middle",
+};
+
+const IotDataTable: React.FC<IotDataTableProps> = ({ alldevice, loading, error }) => {
+  if (loading) return <div style={{ padding: 20 }}>กำลังโหลดข้อมูล…</div>;
+  if (error) return <div style={{ padding: 20, color: "#b00020" }}>เกิดข้อผิดพลาด: {error}</div>;
+  if (!alldevice || alldevice.length === 0) return <div style={{ padding: 20 }}>ไม่มีข้อมูลอุปกรณ์</div>;
+
   return (
-    <div style={{ padding: '20px' }}>
-      <h2>ตารางแสดงผลข้อมูลอุปกรณ์ IoT</h2>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+    <div style={{ padding: 20, overflowX: "auto" }}>
+      <h2 style={{ marginBottom: 12 }}>ตารางแสดงผลข้อมูลอุปกรณ์ IoT</h2>
+
+      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 720 }}>
         <thead>
-          <tr style={{ backgroundColor: '#f0f0f0' }}>
+          <tr style={{ backgroundColor: "#f7f7f7" }}>
             <th style={thStyle}>ชื่ออุปกรณ์</th>
+            <th style={thStyle}>ชื่อสถานที่</th>
             <th style={thStyle}>กำลังไฟฟ้า (W)</th>
             <th style={thStyle}>กระแสไฟฟ้า (A)</th>
             <th style={thStyle}>แรงดันไฟฟ้า (V)</th>
@@ -61,26 +73,29 @@ const IotDataTable: React.FC = () => {
             <th style={thStyle}>สถานะ Relay</th>
           </tr>
         </thead>
+
         <tbody>
-          {sampleData.map((device) => (
+          {alldevice.map((device) => (
             <tr key={device.id}>
               <td style={tdStyle}>{device.name}</td>
+              <td style={tdStyle}>{device.location}</td>
               <td style={tdStyle}>{device.power}</td>
               <td style={tdStyle}>{device.current.toFixed(2)}</td>
               <td style={tdStyle}>{device.voltage}</td>
-              <td style={{ textAlign: 'center', fontSize: '1.4rem', ...tdStyle }}>
-                <Badge bg={getStatusVariant(device.deviceStatus)} pill style={{ backgroundColor: getStatusColor(device.deviceStatus) }}>
+              <td style={{ ...tdStyle, textAlign: "center", fontSize: "1.1rem" }}>
+                {/* ใช้ bg ของ react-bootstrap ตรง ๆ ไม่ต้อง override สีเอง */}
+                <Badge bg={getStatusVariant(device.deviceStatus)} pill>
                   {device.deviceStatus}
                 </Badge>
               </td>
               <td style={tdStyle}>
-              {device.relayStatus
-                .split('')
-                .map((char, index) => (
-                  <span key={index} style={{ fontSize: '1.5rem' }}>
-                    {char === '1' ? '🟩' : '🟥'}
-                  </span>
-                ))}
+                {device.relayStatus
+                  ?.split("")
+                  .map((char, i) => (
+                    <span key={i} style={{ fontSize: "1.3rem", marginRight: 4 }}>
+                      {char === "1" ? "🟩" : "🟥"}
+                    </span>
+                  ))}
               </td>
             </tr>
           ))}
@@ -88,17 +103,6 @@ const IotDataTable: React.FC = () => {
       </table>
     </div>
   );
-};
-
-const thStyle: React.CSSProperties = {
-  padding: '10px',
-  border: '1px solid #ccc',
-  textAlign: 'left',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '10px',
-  border: '1px solid #ccc',
 };
 
 export default IotDataTable;

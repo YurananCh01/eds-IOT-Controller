@@ -6,13 +6,23 @@ type TimerRow = {
   name: string;
   startTime: string;
   endTime: string;
+  days: { [key: string]: boolean }; 
 };
 
 const TimerTable: React.FC = () => {
+  const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const [timers, setTimers] = useState<TimerRow[]>([
-    { id: 1, name: 'Siam Discovery', startTime: '', endTime: '' },
+    { id: 1, name: 'Siam Discovery', startTime: '', endTime: '', days: Object.fromEntries(daysOfWeek.map(d => [d, false])) },
   ]);
-
+  const handleDayChange = (id: number, day: string) => {
+    setTimers(prev =>
+      prev.map(timer =>
+        timer.id === id
+          ? { ...timer, days: { ...timer.days, [day]: !timer.days[day] } }
+          : timer
+      )
+    );
+  };
   const handleChange = (
     id: number,
     field: keyof TimerRow,
@@ -29,7 +39,7 @@ const TimerTable: React.FC = () => {
     const newId = timers.length > 0 ? timers[timers.length - 1].id + 1 : 1;
     setTimers([
       ...timers,
-      { id: newId, name: '', startTime: '', endTime: '' },
+      { id: newId, name: '', startTime: '', endTime: '',days: Object.fromEntries(daysOfWeek.map(d => [d, false])) },
     ]);
   };
 
@@ -47,6 +57,7 @@ const TimerTable: React.FC = () => {
             <th>ชื่อกลุ่ม</th>
             <th>เวลาเปิด</th>
             <th>เวลาปิด</th>
+            <th>สัปดาห์</th>
             <th>การจัดการ</th>
           </tr>
         </thead>
@@ -77,6 +88,18 @@ const TimerTable: React.FC = () => {
                 />
               </td>
               <td>
+                  {daysOfWeek.map(day => (
+                  <label key={day} style={{ marginRight: "6px" }}>
+                    <input
+                      type="checkbox"
+                      checked={timer.days[day]}
+                      onChange={() => handleDayChange(timer.id, day)}
+                    />{" "}
+                    {day}
+                  </label>
+                ))}
+              </td>
+              <td>
                 <button
                   className="delete-btn"
                   onClick={() => removeRow(timer.id)}
@@ -89,7 +112,7 @@ const TimerTable: React.FC = () => {
         </tbody>
       </table>
       <button className="add-btn" onClick={addRow}>
-        เพิ่มกลุ่ม
+        เพิ่ม Timer
       </button>
     </div>
   );

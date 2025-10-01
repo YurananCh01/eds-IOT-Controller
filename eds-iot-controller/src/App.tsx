@@ -5,6 +5,7 @@ import DashboardAdmin from './page/DashboardAdmin';
 import TemplateAdmin from './component/TemplateAdmin';
 import Schedule from './page/Schedule/Schedule';
 import Device from './page/Device/Device';
+import Map from './page/Map/Map';
 export default function App() {
   return (
     <BrowserRouter>
@@ -23,8 +24,11 @@ export default function App() {
         <Route path="/device" element={<TemplateAdmin />} >
           <Route index element={<Device />} />
         </Route>
-           <Route path="/schedule" element={<TemplateAdmin />} >
+        <Route path="/schedule" element={<TemplateAdmin />} >
           <Route index element={<Schedule />} />
+        </Route>
+        <Route path="/map" element={<TemplateAdmin />} >
+          <Route index element={<Map />} />
         </Route>
         {/* fallback */}
         <Route path="*" element={<Navigate to="/login" replace />} />

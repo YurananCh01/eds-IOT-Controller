@@ -1,45 +1,79 @@
 .timer-table-container {
-  max-width: 700px;
+  max-width: 900px;
   margin: 40px auto;
-  padding: 20px;
-  background-color: #fefefe;
-  border: 1px solid #ddd;
+  padding: 24px;
+  background-color: #fff;
   border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   font-family: 'Segoe UI', sans-serif;
 }
 
 .timer-table-container h2 {
   text-align: center;
   margin-bottom: 20px;
+  font-size: 20px;
+  color: #333;
 }
 
 .timer-table {
   width: 100%;
   border-collapse: collapse;
   margin-bottom: 16px;
+  font-size: 14px;
 }
 
-.timer-table th,
+.timer-table th {
+  background-color: #f4f6f8;
+  color: #333;
+  font-weight: 600;
+  padding: 12px;
+  border-bottom: 2px solid #ddd;
+}
+
 .timer-table td {
-  border: 1px solid #ccc;
+  border-bottom: 1px solid #eaeaea;
   padding: 10px;
   text-align: center;
 }
 
+.timer-table tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.timer-table tr:hover {
+  background-color: #f1f7ff;
+}
+
+.timer-table input[type="text"],
 .timer-table input[type="time"] {
-  padding: 4px;
+  padding: 6px 8px;
   font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 95%;
+}
+
+.timer-table input[type="checkbox"] {
+  margin-right: 4px;
+  accent-color: #007bff; /* modern browser support */
+}
+
+.timer-table td label {
+  display: inline-flex;
+  align-items: center;
+  margin: 2px 4px;
+  font-size: 12px;
+  cursor: pointer;
 }
 
 .add-btn,
 .delete-btn {
-  padding: 6px 12px;
+  padding: 6px 14px;
   border: none;
   border-radius: 4px;
   font-size: 14px;
   cursor: pointer;
-  transition: background 0.2s ease-in-out;
+  transition: background 0.2s ease-in-out, transform 0.1s;
 }
 
 .add-btn {
@@ -49,6 +83,7 @@
 
 .add-btn:hover {
   background-color: #218838;
+  transform: translateY(-1px);
 }
 
 .delete-btn {
@@ -58,4 +93,5 @@
 
 .delete-btn:hover {
   background-color: #c82333;
+  transform: translateY(-1px);
 }

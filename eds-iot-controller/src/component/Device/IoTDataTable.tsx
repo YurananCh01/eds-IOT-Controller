@@ -107,7 +107,7 @@ const IotDataTable: React.FC = () => {
         <thead>
           <tr style={{ backgroundColor: '#f0f0f0' }}>
             <th style={thStyle}>ชื่ออุปกรณ์</th>
-            <th style={thStyle}>ชื่อสถานที่</th>
+            <th style={thStyle}>ชื่อกลุ่ม</th>
             <th style={thStyle}>กำลังไฟฟ้า (W)</th>
             <th style={thStyle}>กระแสไฟฟ้า (A)</th>
             <th style={thStyle}>แรงดันไฟฟ้า (V)</th>

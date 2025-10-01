@@ -68,6 +68,15 @@ const TemplateAdmin: React.FC = () => {
                                 HOME
                             </Link>
                         </li>
+                             <li>
+                            <Link
+                                className={activeMenu === "map" ? "active" : ""}
+                                to={`/map`}
+                                onClick={() => handleMenuClick("map")}
+                            > 
+                                Map
+                            </Link>
+                        </li>
                         <li>
                             <Link
                                 className={activeMenu === "device" ? "active" : ""}
@@ -83,9 +92,10 @@ const TemplateAdmin: React.FC = () => {
                                 to={`/schedule`}
                                 onClick={() => handleMenuClick("schedule")}
                             > 
-                                Schedule & Group
+                                Schedule
                             </Link>
                         </li>
+                   
                     </ul>
 
                     <div className="logout" style={{ fontSize: "12px" }}>
