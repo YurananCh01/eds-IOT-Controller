@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require('path');
 const app = express();
 const corsOptions = {
 //   origin: 'https://cms.eds-center.com/', // หรือ IP เช่น http://192.168.1.10:3000
@@ -29,6 +30,12 @@ app.get("/api/devices", (req, res) => {
     ]
     res.json(data);
   });
+
+  // Proxy to Shelly devices
+const DEVICES_PATH = process.env.DEVICES_PATH || path.join(__dirname, './data/devices.json');
+app.use('/shelly', express.raw({ type: '*/*', limit: '1mb' }));
+const createProxyRouter = require('./routes/proxy');
+app.use(createProxyRouter({ devicesPath: DEVICES_PATH }));
 
 const PORT = process.env.PORT|| 4000;;
 app.listen(PORT, () => console.log("✅ Server running on port", PORT));
