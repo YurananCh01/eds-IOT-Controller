@@ -1,10 +1,10 @@
 // server/routes/proxy.js
-const fs = require('fs');
-const http = require('http');
-const https = require('https');
-const express = require('express');
+import fs from "fs";
+import http from "http";
+import https from "https";
+import express from "express";
 
-module.exports = function createProxyRouter(opts = {}) {
+export default function createProxyRouter(opts = {}) {
   const router = express.Router();
   const DEVICES_PATH = opts.devicesPath;
 

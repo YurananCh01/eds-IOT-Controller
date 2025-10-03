@@ -1,3 +1,4 @@
+// GroupList.tsx
 import { useEffect, useMemo, useRef, useState } from "react";
 import axios from "axios";
 import "./GroupList.css";
@@ -9,6 +10,15 @@ export type GroupNode = {
   id: string;
   name: string;
   children?: GroupNode[];
+  // ↓ เพิ่ม: จะถูกเติมโดยฝั่ง frontend
+  devices?: Device[];
+};
+
+type Device = {
+  id: string | number;
+  name: string;
+  group_id: string | number;
+  ipaddress: string;
 };
 
 type CreateGroupBody = { name: string; parent_id: string | null };
@@ -19,6 +29,8 @@ const cls = (...tokens: (string | false | undefined)[]) => tokens.filter(Boolean
 export default function GroupList() {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const [groups, setGroups] = useState<GroupNode[] | null>(null);
+  const [devices, setDevices] = useState<Device[] | null>(null);
+
   const [openMenuId, setOpenMenuId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [loading, setLoading] = useState(false);
@@ -41,7 +53,7 @@ export default function GroupList() {
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
 
-  // Close menu when clicking outside
+  // ปิดเมนู 3 จุดเมื่อคลิกนอก
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
       if (!rootRef.current) return;
@@ -51,24 +63,50 @@ export default function GroupList() {
     return () => document.removeEventListener("click", onDocClick);
   }, []);
 
-  // Initial load
+  // โหลด groups + devices พร้อมกัน
   useEffect(() => {
     (async () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get<GroupNode[]>(`${API}/api/groups`, { timeout: 10000 });
-        setGroups(res.data);
+        const [gRes, dRes] = await Promise.all([
+          axios.get<GroupNode[]>(`${API}/api/groups`, { timeout: 10000 }),
+          axios.get<Device[]>(`${API}/api/devices`, { timeout: 10000 }),
+        ]);
+        setGroups(gRes.data);
+        setDevices(dRes.data);
+
+        // เปิด root ทั้งหมด
         const exp: Record<string, boolean> = {};
-        res.data.forEach((g) => (exp[g.id] = true));
+        gRes.data.forEach((g) => (exp[g.id] = true));
         setExpanded(exp);
       } catch (e: any) {
-        setError(e?.response?.data?.message || "โหลดรายการกลุ่มไม่สำเร็จ");
+        setError(e?.response?.data?.message || "โหลดข้อมูลกลุ่ม/อุปกรณ์ไม่สำเร็จ");
       } finally {
         setLoading(false);
       }
     })();
   }, []);
+
+  // ===== รวม devices เข้าไปใน tree ตาม group_id =====
+  const treeWithDevices = useMemo(() => {
+    if (!groups) return null;
+    const index = new Map<string, Device[]>();
+    (devices ?? []).forEach((d) => {
+      const gid = String(d.group_id);
+      if (!index.has(gid)) index.set(gid, []);
+      index.get(gid)!.push(d);
+    });
+
+    const attach = (items: GroupNode[]): GroupNode[] =>
+      items.map((g) => ({
+        ...g,
+        devices: index.get(String(g.id)) ?? [],
+        children: g.children ? attach(g.children) : g.children,
+      }));
+
+    return attach(groups);
+  }, [groups, devices]);
 
   // ===== Helpers (tree ops) =====
   function updateTree(items: GroupNode[], id: string, upd: (g: GroupNode) => GroupNode): GroupNode[] {
@@ -208,23 +246,31 @@ export default function GroupList() {
     }
   };
 
-  // ===== filter =====
+  // ===== filter (กับ tree ที่มี devices แล้ว) =====
   const filtered = useMemo(() => {
-    if (!groups) return null;
-    if (!filter.trim()) return groups;
+    if (!treeWithDevices) return null;
+    if (!filter.trim()) return treeWithDevices;
     const q = filter.trim().toLowerCase();
+
     const matchTree = (items: GroupNode[]): GroupNode[] => {
       const out: GroupNode[] = [];
       for (const g of items) {
         const kids = g.children ? matchTree(g.children) : undefined;
-        if (g.name.toLowerCase().includes(q) || (kids && kids.length > 0)) {
-          out.push({ ...g, children: kids });
+        const selfHit =
+          g.name.toLowerCase().includes(q) ||
+          (g.devices ?? []).some(
+            (d) =>
+              d.name.toLowerCase().includes(q) ||
+              String(d.ipaddress).toLowerCase().includes(q)
+          );
+        if (selfHit || (kids && kids.length > 0)) {
+          out.push({ ...g, children: kids, devices: g.devices });
         }
       }
       return out;
     };
-    return matchTree(groups);
-  }, [groups, filter]);
+    return matchTree(treeWithDevices);
+  }, [treeWithDevices, filter]);
 
   return (
     <div ref={rootRef} className="gl-root">
@@ -238,7 +284,7 @@ export default function GroupList() {
         <div className="gl-actions">
           <input
             className="gl-search"
-            placeholder="ค้นหากลุ่ม…"
+            placeholder="ค้นหากลุ่มหรืออุปกรณ์…"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
           />
@@ -293,7 +339,7 @@ export default function GroupList() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-        <Button variant="primary" onClick={handleCreateSubmit} disabled={!createName.trim() || saving}>
+          <Button variant="primary" onClick={handleCreateSubmit} disabled={!createName.trim() || saving}>
             บันทึก
           </Button>
           <Button variant="secondary" onClick={() => setCreateOpen(false)}>
@@ -326,7 +372,7 @@ export default function GroupList() {
           </Form>
         </Modal.Body>
         <Modal.Footer>
-        <Button variant="primary" onClick={handleRenameSubmit} disabled={!renameName.trim() || saving}>
+          <Button variant="primary" onClick={handleRenameSubmit} disabled={!renameName.trim() || saving}>
             บันทึก
           </Button>
           <Button variant="secondary" onClick={() => setRenameOpen(false)}>
@@ -344,7 +390,7 @@ export default function GroupList() {
           คุณต้องการลบกลุ่ม <strong>{deleteName}</strong> และกลุ่มย่อยทั้งหมดหรือไม่?
         </Modal.Body>
         <Modal.Footer>
-        <Button variant="danger" onClick={handleDeleteConfirm} disabled={saving}>
+          <Button variant="danger" onClick={handleDeleteConfirm} disabled={saving}>
             ลบ
           </Button>
           <Button variant="secondary" onClick={() => setDeleteOpen(false)}>
@@ -378,13 +424,15 @@ function TreeView(props: {
               <button
                 aria-label={expanded[g.id] ? "Collapse" : "Expand"}
                 onClick={() => toggle(g.id)}
-                className={cls("gl-caret", !g.children?.length && "gl-caret--disabled")}
+                className={cls("gl-caret", !g.children?.length && !g.devices?.length && "gl-caret--disabled")}
               >
                 {expanded[g.id] ? "▾" : "▸"}
               </button>
               <span className="gl-name">
                 <span className="gl-dot" />
                 <span className="gl-name-text">{g.name}</span>
+                {/* แสดงจำนวนอุปกรณ์ในกลุ่มนี้ */}
+                {(g.devices?.length ?? 0) > 0 && <span className="gl-badge">{g.devices!.length}</span>}
               </span>
             </div>
 
@@ -415,6 +463,22 @@ function TreeView(props: {
             </div>
           </div>
 
+          {/* แสดงอุปกรณ์ของกลุ่มนี้ */}
+          {expanded[g.id] && (g.devices?.length ?? 0) > 0 && (
+            <ul className="gl-devs">
+              {g.devices!.map((d) => (
+                <li key={String(d.id)} className="gl-dev-row">
+                  <div className="gl-dev-left">
+                    <span className="gl-dev-icon">📟</span>
+                    <span className="gl-dev-name">{d.name}</span>
+                  </div>
+                  <span className="gl-dev-ip">{d.ipaddress}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+
+          {/* แสดงกลุ่มย่อย */}
           {g.children && g.children.length > 0 && expanded[g.id] && (
             <div className="gl-children">
               <TreeView

@@ -12,8 +12,7 @@ type LoginSuccess = {
   token: string; // JWT
   user: {
     id: number;
-    name: string;
-    email: string;
+    username: string;
     role: "Admin" | "User" | string;
   };
 };
@@ -55,7 +54,7 @@ export default function Login() {
         // }, 700);
     try {
       const res = await axios.post<LoginSuccess>(`${API}/api/login`, {
-        email: input.emp_email.trim(),
+        username: input.emp_email.trim(),
         password: input.emp_pass,
       }, {
         timeout: 10000,
