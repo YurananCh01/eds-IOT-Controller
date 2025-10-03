@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState,useCallback } from "react";
 import { Link, Outlet, useNavigate } from "react-router-dom";
+import axios from "axios";
 // import axios from "axios";
 import "./TemplateAdmin.css";
 
@@ -19,10 +20,27 @@ const TemplateAdmin: React.FC = () => {
         localStorage.setItem("activeMenu", menu);
     };
 
-    const handleLogout = () => {
-        // localStorage.clear();
-        navigate("/login");
-    };
+    const handleLogout = useCallback(() => {
+    // ถ้ามีการยืนยันก่อนออก:
+    // if (!confirm("ออกจากระบบ?")) return;
+
+    // ลบ token / user ที่คุณเก็บไว้
+    try {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    } catch { }
+
+    // ถ้าตั้ง axios default header ไว้ ให้ลบทิ้ง
+    try {
+      delete axios.defaults.headers.common["Authorization"];
+    } catch { }
+
+    // (ถ้าหลังบ้านมี endpoint /auth/logout ที่ต้องแจ้ง ก็สามารถยิงแล้วค่อย navigate ได้)
+    // await axios.post("/api/auth/logout").catch(() => {})
+
+    navigate("/login", { replace: true });
+  }, [navigate]);
+
 
 
 

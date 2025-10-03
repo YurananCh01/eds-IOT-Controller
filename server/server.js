@@ -11,6 +11,7 @@ import groupsRouter from "./routes/group.js";
 import authRoute from "./routes/auth.js";       
 import createProxyRouter from "./routes/proxy.js";
 import devicesRouter from "./routes/devices.js";
+import authRoutes from './routes/auth.js';
 const app = express();
 const corsOptions = {
 //   origin: 'https://cms.eds-center.com/', // หรือ IP เช่น http://192.168.1.10:3000
@@ -27,6 +28,7 @@ app.use(express.json());
 app.use("/api", groupsRouter);
 app.use("/api", authRoute);
 app.use("/api/devices", devicesRouter);
+app.use('/auth', authRoutes)
 // const GetDevice = require("./routes/mqtt");
 
 

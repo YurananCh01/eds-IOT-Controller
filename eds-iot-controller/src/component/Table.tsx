@@ -80,7 +80,7 @@ const IotDataTable: React.FC<IotDataTableProps> = ({ alldevice, loading, error }
               <td style={tdStyle}>{device.name}</td>
               <td style={tdStyle}>{device.location}</td>
               <td style={tdStyle}>{device.power}</td>
-              <td style={tdStyle}>{device.current.toFixed(2)}</td>
+              {/* <td style={tdStyle}>{device.current.toFixed(2)}</td> */}
               <td style={tdStyle}>{device.voltage}</td>
               <td style={{ ...tdStyle, textAlign: "center", fontSize: "1.1rem" }}>
                 {/* ใช้ bg ของ react-bootstrap ตรง ๆ ไม่ต้อง override สีเอง */}

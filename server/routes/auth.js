@@ -1,67 +1,46 @@
+// routes/auth.js (ESM)
 import express from "express";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
-import { query } from "./db.js";   
+import { query } from "./db.js";   // ต้อง export pool จาก db.js (mysql2/promise)
 import "dotenv/config";
 
 const router = express.Router();
-// Dummy user
-// const user = {
-//   id:1,
-//   username: "admin",
-//   passwordHash: bcrypt.hashSync("123456", 10), // ตั้งรหัสผ่านไว้ล่วงหน้า
-//   role: "Admin"
-// };
-
-const JWT_SECRET = process.env.JWT_SECRET;
-
-
 
 router.post("/login", async (req, res) => {
   try {
-  const { username, password } = req.body || {};
-  console.log(username,password);
+    const { username, password } = req.body || {};
     if (!username || !password) {
-      return res.status(400).json({ message: "กรอกอีเมลและรหัสผ่าน" });
+      return res.status(400).json({ ok: false, error: "username & password required" });
     }
-     
+
+    // ใช้ placeholder แบบ Postgres: $1
     const result = await query(
-      `SELECT id, username, password, role
+      `SELECT id, username, password
        FROM users
        WHERE username = $1
        LIMIT 1`,
       [username]
     );
-    
-   if (result.rowCount === 0) {
-      return res.status(401).json({ message: "Email หรือรหัสผ่านไม่ถูกต้อง" });
-    }
-     const u = result.rows[0];
-     const ok = await bcrypt.compare(password, u.password);
-    if (!ok) {
-      return res.status(401).json({ message: "Email หรือรหัสผ่านไม่ถูกต้อง" });
-    }
-  // สร้าง JWT
-     const token = jwt.sign(
-      { sub: u.id, username: u.username, role: u.role },
-      JWT_SECRET,
-      { expiresIn: "12h" }
-    );
 
-     res.json({
-      token,
-      user: {
-        id: u.id,
-        username: u.username,
-        role: u.role,
-      },
-    });
-}
-catch (err) {
-    console.error("[LOGIN ERROR]", err);
-    res.status(500).json({ message: "เกิดข้อผิดพลาดที่เซิร์ฟเวอร์" });
+    if (result.rowCount === 0) {
+      return res.status(401).json({ ok: false, error: "ชื่อผู้ใช้ไม่ถูกต้อง" });
+    }
+
+    const u = result.rows[0];
+    const match = await bcrypt.compare(password, u.password);
+    if (!match) {
+      return res.status(401).json({ ok: false, error: "รหัสผ่านไม่ถูกต้อง" });
+    }
+
+    const payload = { uid: u.id, username: u.username };
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: "7d" });
+
+    return res.json({ ok: true, token, user: payload });
+  } catch (e) {
+    console.error("[LOGIN ERROR]", e);
+    return res.status(500).json({ ok: false, error: "server error" });
   }
 });
 
-
-export default router; 
+export default router;
