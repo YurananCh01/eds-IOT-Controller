@@ -1,17 +1,17 @@
 // src/pages/Login/Login.tsx
 import '../Login/Login.css';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useState } from 'react';
 
 type LoginForm = {
-  username: string;
+  username: string;     // ← เปลี่ยนเป็น username
   password: string;
 };
 
 type LoginSuccess = {
   ok: true;
-  user: { id: number; user_name: string };
+  user: { id: number; username: string };
   token?: string;
 };
 
@@ -26,8 +26,9 @@ type LoginResponse = LoginSuccess | LoginFail;
 const API = (import.meta.env.VITE_API_URL as string) ?? 'http://localhost:5151';
 
 export default function Login() {
+  const location = useLocation();
   const navigate = useNavigate();
-  const [input, setInput] = useState<LoginForm>({ username: '', password: '' });
+  const [input, setInput] = useState<LoginForm>({ username: '', password: '' }); // ← เปลี่ยน state
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
@@ -46,12 +47,14 @@ export default function Login() {
     try {
       const { data, status } = await axios.post<LoginResponse>(
         `${API}/auth/login`,
-        { username: input.username.trim(), password: input.password },
         {
-          // ไม่ใช้ withCredentials เพราะเราใช้ JWT header ไม่ใช่คุกกี้
+          username: input.username.trim(),   // ← ส่ง username ให้ตรง backend
+          password: input.password,
+        },
+        {
           headers: { 'Content-Type': 'application/json' },
           timeout: 10000,
-          validateStatus: () => true, // อ่าน body ได้แม้ 4xx
+          validateStatus: () => true,
         }
       );
 
@@ -66,15 +69,15 @@ export default function Login() {
 
       const success = data as LoginSuccess;
 
-      // เก็บ token + user ตามต้องการ
       if (success.token) {
         localStorage.setItem('token', success.token);
         axios.defaults.headers.common['Authorization'] = `Bearer ${success.token}`;
       }
       localStorage.setItem('user', JSON.stringify(success.user));
 
-      // ไปหน้าแอดมิน (ปรับเส้นทางตามโปรเจกต์)
-      navigate('/templateAdmin', { replace: true });
+      // ถ้ามีหน้าเดิมที่ถูกเด้งมา (state.from) ให้กลับไปหน้านั้น ไม่งั้นไป /templateAdmin
+      const from = (location.state as any)?.from || '/templateAdmin';
+      navigate(from, { replace: true });
     } catch (err: any) {
       const msg =
         err?.response?.data?.error ||
@@ -103,11 +106,11 @@ export default function Login() {
 
           <form onSubmit={handleLogin}>
             <div className="form-group">
-              <label htmlFor="user_name">ชื่อผู้ใช้</label>
+              <label htmlFor="username">ชื่อผู้ใช้</label>
               <input
-                id="user_name"
+                id="username"
                 type="text"
-                name="username"
+                name="username"                 
                 value={input.username}
                 onChange={handleInputChange}
                 placeholder="กรอกชื่อผู้ใช้"
